@@ -197,7 +197,7 @@ fun defineBoxColor(text: String) =
     }
 
 @Composable
-fun InputPanel(modifier: Modifier = Modifier, state: State<Display>) {
+fun InputPanel(modifier: Modifier = Modifier, state: State<CalculatorState>) {
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -219,18 +219,56 @@ fun InputPanel(modifier: Modifier = Modifier, state: State<Display>) {
         horizontalAlignment = Alignment.End,
         verticalArrangement = Arrangement.Bottom
     ) {
-        Text(
-            text = state.value.expression,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 36.sp,
-            color = MaterialTheme.colorScheme.onPrimaryContainer,
-        )
-        Text(
-            text = state.value.result,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 17.sp,
-            color = MaterialTheme.colorScheme.onSecondaryContainer,
-        )
+
+        when (val currentState = state.value) {
+            CalculatorState.Initial -> Unit
+
+            is CalculatorState.Input -> {
+                Text(
+                    text = currentState.expression,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 36.sp,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                )
+                Text(
+                    text = currentState.result,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 17.sp,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                )
+            }
+
+            is CalculatorState.Success -> {
+                Text(
+                    text = currentState.result,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 36.sp,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                )
+                Text(
+                    text = "",
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 17.sp,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                )
+            }
+
+            is CalculatorState.Error -> {
+                Text(
+                    text = currentState.expression,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 36.sp,
+                    color = MaterialTheme.colorScheme.error,
+                )
+                Text(
+                    text = "",
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 17.sp,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                )
+            }
+        }
+
     }
 }
 
