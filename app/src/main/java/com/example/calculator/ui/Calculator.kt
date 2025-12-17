@@ -35,8 +35,6 @@ import com.example.calculator.specialSymbolsList
 import com.example.calculator.symbolMap
 import com.example.calculator.ui.theme.CalculatorTheme
 
-
-
 @Composable
 fun Calculator(
     modifier: Modifier = Modifier,
@@ -53,7 +51,8 @@ fun Calculator(
         )
 
         SpecialSymbols(
-            modifier = Modifier.padding(top = 16.dp)
+            modifier = Modifier.padding(top = 16.dp),
+            onCellClick = viewModel::processCommand
         )
 
         KeyBoard(
@@ -229,7 +228,7 @@ fun InputPanel(modifier: Modifier = Modifier, state: State<CalculatorState>) {
 }
 
 @Composable
-fun SpecialSymbols(modifier: Modifier = Modifier) {
+fun SpecialSymbols(modifier: Modifier = Modifier, onCellClick: (CalculatorCommand) -> Unit) {
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -238,13 +237,20 @@ fun SpecialSymbols(modifier: Modifier = Modifier) {
     ) {
         specialSymbolsList.forEach { symbol ->
             Text(
-                modifier = modifier.weight(1f),
+                modifier = modifier
+                    .weight(1f)
+                    .clickable {
+                        onCellClick(
+                            CalculatorCommand.Input((symbolMap[symbol] ?: Symbol.UNSUPPORTED))
+                        )
+                    },
                 text = symbol,
                 color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 30.sp,
                 fontWeight = FontWeight.SemiBold,
-                textAlign = TextAlign.Center
-            )
+                textAlign = TextAlign.Center,
+
+                )
         }
     }
 }
