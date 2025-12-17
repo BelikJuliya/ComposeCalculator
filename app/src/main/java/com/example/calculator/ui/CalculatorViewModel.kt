@@ -3,6 +3,7 @@ package com.example.calculator.ui
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import org.mariuszgromada.math.mxparser.Expression
 import kotlin.random.Random
 
 class CalculatorViewModel : ViewModel() {
@@ -18,12 +19,12 @@ class CalculatorViewModel : ViewModel() {
                 expression = ""
                 _stateFlow.value = CalculatorState.Initial
             }
+
             CalculatorCommand.Evaluate -> {
-                val isError = Random.nextBoolean()
-                if (isError) {
-                    _stateFlow.value = CalculatorState.Error(expression = "100/0")
-                } else {
-                    _stateFlow.value = CalculatorState.Success(result = "100")
+                evaluate()?.let {
+                    _stateFlow.value = CalculatorState.Success(result = it)
+                } ?: run {
+                    _stateFlow.value = CalculatorState.Error(expression = expression)
                 }
             }
 
@@ -35,11 +36,18 @@ class CalculatorViewModel : ViewModel() {
                 expression += symbol
                 _stateFlow.value = CalculatorState.Input(
                     expression = expression,
-                    result = "100"
+                    result = evaluate() ?: ""
                 )
             }
         }
     }
+
+    private fun evaluate(): String? = expression
+        .replace(',', '.')
+        .replace('X', '*')
+        .let { Expression(it) }
+        .calculate()
+        .takeIf { it.isFinite() }?.toString()
 
     private fun getCorrectParenthesis(): String {
         val openCount = expression.count { it == '(' }
