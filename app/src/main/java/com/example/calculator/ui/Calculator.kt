@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
@@ -26,48 +27,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.calculator.ALL_CLEAR
+import com.example.calculator.EVALUATE
+import com.example.calculator.ZERO
+import com.example.calculator.cellsList
+import com.example.calculator.specialSymbolsList
+import com.example.calculator.symbolMap
 import com.example.calculator.ui.theme.CalculatorTheme
 
-const val ALL_CLEAR = "AC"
-const val EVALUATE = "="
-const val ZERO = "0"
 
-private val cellsList = listOf(
-    listOf("AC", "(  )", "%", "÷"),
-    listOf("7", "8", "9", "X"),
-    listOf("4", "5", "6", "-"),
-    listOf("1", "2", "3", "+"),
-    listOf("0", ",", "="),
-)
-
-private val symbolMap = mapOf(
-    "0" to Symbol.DIGIT_0,
-    "1" to Symbol.DIGIT_1,
-    "2" to Symbol.DIGIT_2,
-    "3" to Symbol.DIGIT_3,
-    "4" to Symbol.DIGIT_4,
-    "5" to Symbol.DIGIT_5,
-    "6" to Symbol.DIGIT_6,
-    "7" to Symbol.DIGIT_7,
-    "8" to Symbol.DIGIT_8,
-    "9" to Symbol.DIGIT_9,
-
-    "+" to Symbol.ADD,
-    "-" to Symbol.SUBTRACT,
-    "X" to Symbol.MULTIPLY,
-    "÷" to Symbol.DIVIDE,
-    "%" to Symbol.PRECENT,
-    "^" to Symbol.POWER,
-    "!" to Symbol.FACTORIAL,
-    "√" to Symbol.SQRT,
-    "^" to Symbol.PI,
-    "," to Symbol.DOT,
-    "(  )" to Symbol.PARENTHESIS
-)
-
-private val specialSymbolsList = listOf(
-    "√", "π", "^", "!"
-)
 
 @Composable
 fun Calculator(
@@ -77,16 +45,21 @@ fun Calculator(
     val state = viewModel.stateFlow.collectAsState()
 
     Column(
-        verticalArrangement = Arrangement.SpaceEvenly
+        modifier = modifier.fillMaxSize()
     ) {
-        InputPanel(modifier = modifier.weight(1f), state)
-        SpecialSymbols(
-            modifier = modifier
-                .padding(top = 16.dp)
+        InputPanel(
+            modifier = Modifier.weight(1f),
+            state = state
         )
-        KeyBoard(modifier = modifier, onCellClick = {
-            viewModel.processCommand(it)
-        })
+
+        SpecialSymbols(
+            modifier = Modifier.padding(top = 16.dp)
+        )
+
+        KeyBoard(
+            modifier = Modifier,
+            onCellClick = viewModel::processCommand
+        )
     }
 }
 
@@ -118,7 +91,7 @@ fun CellsLine(
                                 EVALUATE -> CalculatorCommand.Evaluate
                                 ALL_CLEAR -> CalculatorCommand.Clear
                                 else -> {
-                                    CalculatorCommand.Input(symbolMap[cell] ?: Symbol.UNSUPPORTED)
+                                    CalculatorCommand.Input((symbolMap[cell] ?: Symbol.UNSUPPORTED))
                                 }
                             }
                         )
