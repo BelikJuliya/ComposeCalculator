@@ -1,6 +1,5 @@
 package com.example.calculator.ui
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -11,9 +10,14 @@ class CalculatorViewModel : ViewModel() {
     private val _stateFlow: MutableStateFlow<CalculatorState> = MutableStateFlow(CalculatorState.Initial)
     val stateFlow = _stateFlow.asStateFlow()
 
-    fun processCommand(input: CalculatorCommand) {
-        when (input) {
-            CalculatorCommand.Clear -> _stateFlow.value = CalculatorState.Initial
+    var expression: String = ""
+
+    fun processCommand(command: CalculatorCommand) {
+        when (command) {
+            CalculatorCommand.Clear -> {
+                expression = ""
+                _stateFlow.value = CalculatorState.Initial
+            }
             CalculatorCommand.Evaluate -> {
                 val isError = Random.nextBoolean()
                 if (isError) {
@@ -24,11 +28,30 @@ class CalculatorViewModel : ViewModel() {
             }
 
             is CalculatorCommand.Input -> {
+                val symbol = if (command.input == Symbol.PARENTHESIS) {
+                    getCorrectParenthesis()
+                } else command.input.value
+
+                expression += symbol
                 _stateFlow.value = CalculatorState.Input(
-                    expression = input.input.name,
+                    expression = expression,
                     result = "100"
                 )
             }
+        }
+    }
+
+    private fun getCorrectParenthesis(): String {
+        val openCount = expression.count { it == '(' }
+        val closeCount = expression.count { it == ')' }
+        return when {
+            expression.isEmpty() -> "("
+            expression.last().let {
+                !it.isDigit() && it != '(' && it != 'π'
+            } -> "("
+
+            openCount > closeCount -> ")"
+            else -> "("
         }
     }
 }

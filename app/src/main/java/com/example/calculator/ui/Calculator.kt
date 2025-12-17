@@ -69,8 +69,6 @@ private val specialSymbolsList = listOf(
     "√", "π", "^", "!"
 )
 
-private val viewModel = CalculatorViewModel()
-
 @Composable
 fun Calculator(
     modifier: Modifier = Modifier,
@@ -86,22 +84,17 @@ fun Calculator(
             modifier = modifier
                 .padding(top = 16.dp)
         )
-        KeyBoard(modifier = modifier)
-    }
-}
-
-@Composable
-@Preview
-fun CalculatorPreview() {
-    CalculatorTheme {
-        Calculator()
+        KeyBoard(modifier = modifier, onCellClick = {
+            viewModel.processCommand(it)
+        })
     }
 }
 
 @Composable
 fun CellsLine(
     modifier: Modifier = Modifier,
-    cellsList: List<String>
+    cellsList: List<String>,
+    onCellClick: (CalculatorCommand) -> Unit
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -120,7 +113,7 @@ fun CellsLine(
                     .weight(if (cell == ZERO) 2f else 1f)
                     .aspectRatio(if (cell == ZERO) 2 / 1f else 1f)
                     .clickable {
-                        viewModel.processCommand(
+                        onCellClick(
                             when (cell) {
                                 EVALUATE -> CalculatorCommand.Evaluate
                                 ALL_CLEAR -> CalculatorCommand.Clear
@@ -145,15 +138,7 @@ fun CellsLine(
 }
 
 @Composable
-@Preview
-fun KeyboardPreview() {
-    CalculatorTheme {
-        KeyBoard()
-    }
-}
-
-@Composable
-fun KeyBoard(modifier: Modifier = Modifier) {
+fun KeyBoard(modifier: Modifier = Modifier, onCellClick: (CalculatorCommand) -> Unit) {
     Box(
         modifier
             .background(MaterialTheme.colorScheme.background)
@@ -172,19 +157,11 @@ fun KeyBoard(modifier: Modifier = Modifier) {
             cellsList.forEach { line ->
                 CellsLine(
                     modifier = modifier,
-                    cellsList = line
+                    cellsList = line,
+                    onCellClick = onCellClick
                 )
             }
         }
-    }
-}
-
-@Preview
-@Composable
-fun CellsLinePreview() {
-//    CellsLine(cellsList = listOf("7", "8", "9", "X"))
-    CalculatorTheme {
-        CellsLine(cellsList = listOf("0", ",", "="))
     }
 }
 
@@ -228,12 +205,14 @@ fun InputPanel(modifier: Modifier = Modifier, state: State<CalculatorState>) {
                     text = currentState.expression,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 36.sp,
+                    lineHeight = 36.sp,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
                 Text(
                     text = currentState.result,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 17.sp,
+                    lineHeight = 17.sp,
                     color = MaterialTheme.colorScheme.onSecondaryContainer,
                 )
             }
@@ -243,12 +222,14 @@ fun InputPanel(modifier: Modifier = Modifier, state: State<CalculatorState>) {
                     text = currentState.result,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 36.sp,
+                    lineHeight = 36.sp,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
                 Text(
                     text = "",
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 17.sp,
+                    lineHeight = 17.sp,
                     color = MaterialTheme.colorScheme.onSecondaryContainer,
                 )
             }
@@ -258,12 +239,14 @@ fun InputPanel(modifier: Modifier = Modifier, state: State<CalculatorState>) {
                     text = currentState.expression,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 36.sp,
+                    lineHeight = 36.sp,
                     color = MaterialTheme.colorScheme.error,
                 )
                 Text(
                     text = "",
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 17.sp,
+                    lineHeight = 17.sp,
                     color = MaterialTheme.colorScheme.onSecondaryContainer,
                 )
             }
@@ -271,22 +254,6 @@ fun InputPanel(modifier: Modifier = Modifier, state: State<CalculatorState>) {
 
     }
 }
-
-//@Composable
-//@Preview
-//fun ExpressionPreview() {
-//    CalculatorTheme {
-//        InputPanel()
-//    }
-//}
-
-//@Composable
-//@Preview
-//fun SpecialSymbolsPreview() {
-//    CalculatorTheme {
-//        SpecialSymbols()
-//    }
-//}
 
 @Composable
 fun SpecialSymbols(modifier: Modifier = Modifier) {
@@ -306,5 +273,46 @@ fun SpecialSymbols(modifier: Modifier = Modifier) {
                 textAlign = TextAlign.Center
             )
         }
+    }
+}
+
+//@Composable
+//@Preview
+//fun ExpressionPreview() {
+//    CalculatorTheme {
+//        InputPanel()
+//    }
+//}
+
+//@Composable
+//@Preview
+//fun SpecialSymbolsPreview() {
+//    CalculatorTheme {
+//        SpecialSymbols()
+//    }
+//}
+
+//@Preview
+//@Composable
+//fun CellsLinePreview() {
+////    CellsLine(cellsList = listOf("7", "8", "9", "X"))
+//    CalculatorTheme {
+//        CellsLine(cellsList = listOf("0", ",", "="), onCellClick = CalculatorCommand.Input(input = Symbol.DIGIT_4))
+//    }
+//}
+
+//@Composable
+//@Preview
+//fun KeyboardPreview() {
+//    CalculatorTheme {
+//        KeyBoard()
+//    }
+//}
+
+@Composable
+@Preview
+fun CalculatorPreview() {
+    CalculatorTheme {
+        Calculator()
     }
 }
